@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:design="http://schemas.android.com/apk/res-auto"
+    tools:context="com.example.monitor.dsmeteo1.Ubication"
+    android:background="@drawable/fondoubication1">
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        tools:context=".MainActivity">
+
+        <TextView
+            android:id="@+id/tv_provincia"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="160dp"
+            android:text="@string/provincia"
+            android:textSize="20sp" />
+
+        <Spinner
+            android:id="@+id/sp_provincia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/provincia_prompt"
+            android:spinnerMode="dropdown"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tv_localidad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/localidad"
+            android:textSize="20sp" />
+
+        <Spinner
+            android:id="@+id/sp_localidad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/localidad_prompt"
+            android:spinnerMode="dropdown" />
+
+        <Button
+            android:id="@+id/boton_buscar_usuario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:background="@color/colorPrimaryDark"
+            android:onClick="showLocalidadSelected"
+            android:text="Buscar"
+            android:textColor="@android:color/background_light" />
+
+    </LinearLayout>
+
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/NavBot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#303f9f"
+        design:itemIconTint = "#ffffff"
+        app:itemTextColor="#ffffff"
+        android:layout_gravity="bottom"
+        design:menu="@menu/menu_nav" />
+
+</android.support.design.widget.CoordinatorLayout>
