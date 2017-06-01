@@ -20,7 +20,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".Select" />
         <activity android:name=".Ubication" />
         <activity android:name=".Registro" />
         <activity android:name=".InvitadoActivity" />

@@ -2,11 +2,14 @@ package com.example.monitor.dsmeteo1;
 
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,11 +19,26 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.Toast;
 
-import static com.example.monitor.dsmeteo1.R.layout.activity_ubication;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+
 
 public class Ubication extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private static final String TAG = "Ubication";
     private SectionsPageAdapter mSectionsPageAdapter;
+
+    //CONEXION BASE DATOS
+    private static final String url = "jdbc:mysql://192.168.1.102:3306/ciudades";
+    private static final String user = "root";
+    private static final String pass = "monitor2016";
+
+    private static String localidad = "";
+
 
     private Spinner spProvincias, spLocalidades;
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +50,7 @@ public class Ubication extends AppCompatActivity implements AdapterView.OnItemSe
         loadSpinnerProvincias();
 
 
-//menu
+        //menu
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.NavBot);
         BottomNavigationViewHelper.disableShiftMode(bottomNavigationView);
 
@@ -40,18 +58,11 @@ public class Ubication extends AppCompatActivity implements AdapterView.OnItemSe
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.favoritosid:
-                        Intent intent = new Intent(Ubication.this, favorites.class);
-                        startActivity(intent);
-                        break;
                     case R.id.ubicacionid:
                         Intent intent2 = new Intent(Ubication.this, Ubication.class);
                         startActivity(intent2);
                         break;
-                    case R.id.buscarid:
-                        Intent intent3 = new Intent(Ubication.this, Select.class);
-                        startActivity(intent3);
-                        break;
+
                     case R.id.powerid:
                         Intent intent4 = new Intent(Ubication.this, LoginActivity.class);
                         startActivity(intent4);
@@ -127,62 +138,107 @@ public class Ubication extends AppCompatActivity implements AdapterView.OnItemSe
         // activated or when the adapter becomes empty.
     }
 
+
     /**
      * Shows the selected strings from spinners.
      *
      * @param v
      *            The view that was clicked.
      */
-    public void showLocalidadSelected(View v) {
 
-        Button boton_buscar = (Button)findViewById(R.id.boton_buscar_usuario);
 
-        Intent x = getIntent();
-        Bundle b = x.getExtras();
-        final String logeado = b.getString("logeado");
+    public void showLocalidadSelected(View v) throws ExecutionException, InterruptedException {
 
-//        boton_buscar.setOnClickListener(new View.OnClickListener() {
+//        Button boton_buscar = (Button)findViewById(R.id.boton_buscar_usuario);
 //
-//            @Override
-//            public void onClick(View v) {
-//
-//                if (logeado.equals("si")){
-//                    startActivity(new Intent(Ubication.this, URegistradoActivity.class));
-//                } else if (logeado.equals("no")){
-//                    startActivity(new Intent(Ubication.this, InvitadoActivity.class));
+//        Intent x = getIntent();
+//        Bundle b = x.getExtras();
+//        final String logeado = b.getString("logeado");
+
+        localidad = spLocalidades.getSelectedItem().toString();
+
+
+        final MyTask devolver = new MyTask();
+        devolver.execute().get();
+
+//        if (logeado.equals("si")) {
+//            boton_buscar.setOnClickListener(new View.OnClickListener() {
+//                //
+//                @Override
+//                public void onClick(View v) {
+//                    startActivity(new Intent(Ubication.this, URegistradoActivity.class).putExtra("localidad", (CharSequence) devolver));
 //                }
 //
-//            }
+//            });
+//        } else if (logeado.equals("no")){
+//            boton_buscar.setOnClickListener(new View.OnClickListener() {
+//                //
+//                @Override
+//                public void onClick(View v) {
+//                    startActivity(new Intent(Ubication.this, InvitadoActivity.class).putExtra("localidad", (CharSequence) devolver));
+//                }
 //
-//        });
+//            });
+//        }
 
-        if (logeado.equals("si")) {
-            boton_buscar.setOnClickListener(new View.OnClickListener() {
-                //
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(Ubication.this, URegistradoActivity.class));
-                }
+        Toast.makeText(
+                getApplicationContext(),
+                getString(R.string.message, spLocalidades.getSelectedItem()
+                        .toString(), spProvincias.getSelectedItem().toString()),
+                Toast.LENGTH_LONG).show();
 
-            });
-        } else if (logeado.equals("no")){
-            boton_buscar.setOnClickListener(new View.OnClickListener() {
-                //
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(Ubication.this, InvitadoActivity.class));
-                }
+    }
 
-            });
+    private class MyTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String codigo = "";
+
+            try {
+
+
+                Class.forName("com.mysql.jdbc.Driver");
+                Log.v("Mysql","carga correcta del driver");
+                Connection con = DriverManager.getConnection(url, user, pass);
+
+                Statement st = con.createStatement();
+                String sql =("SELECT CONCAT(CPRO, CMUN) as codigo FROM ciudad inner join provincias ON ciudad.CPRO = provincias.id_pro where NOMBRE= '"+localidad+"';");
+
+                final ResultSet rs = st.executeQuery(sql);
+                rs.next();
+                codigo = rs.getString(1);
+
+
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+
+            }
+
+            return codigo;
         }
 
+        @Override
+        protected void onPostExecute(final String result){
 
-//        Toast.makeText(
-//                getApplicationContext(),
-//                getString(R.string.message, spLocalidades.getSelectedItem()
-//                        .toString(), spProvincias.getSelectedItem().toString()),
-//                Toast.LENGTH_LONG).show();
+            //super.onPostExecute(result);
 
+            Intent x = getIntent();
+            Bundle b = x.getExtras();
+            final String logeado = b.getString("logeado");
+
+
+                    if (logeado.equals("si")) {
+                        startActivity(new Intent(Ubication.this, URegistradoActivity.class).putExtra("localidad", result));
+                    } else if (logeado.equals("no")){
+                        startActivity(new Intent(Ubication.this, InvitadoActivity.class).putExtra("localidad",result));
+                    }
+
+
+        }
     }
 
 

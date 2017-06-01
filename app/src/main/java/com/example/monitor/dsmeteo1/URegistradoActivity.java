@@ -1,5 +1,6 @@
 package com.example.monitor.dsmeteo1;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,10 +22,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class URegistradoActivity extends AppCompatActivity {
 
     TextView Ciudad;
+
     TextView MinMax;
+    TextView MinMaxMañana;
+    TextView MinMaxPasadoMañana;
+
     ImageView imageViewIconos;
     ImageView imageViewIconos_Mañana;
     ImageView imageViewIconosPasadoMañana;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +39,9 @@ public class URegistradoActivity extends AppCompatActivity {
 
         Ciudad = (TextView) this.findViewById(R.id.Ciudad);
         MinMax = (TextView) this.findViewById(R.id.MinMax);
+        MinMaxMañana = (TextView) this.findViewById(R.id.MinMax_Mañana) ;
+        MinMaxPasadoMañana = (TextView) this.findViewById(R.id.MinMaxPasado) ;
+
         imageViewIconos=(ImageView)this.findViewById(R.id.imageViewIconos);
         imageViewIconos_Mañana=(ImageView)this.findViewById(R.id.imageViewIconos_Mañana);
         imageViewIconosPasadoMañana=(ImageView)this.findViewById(R.id.imageViewIconosPasadoMañana);
@@ -42,19 +51,32 @@ public class URegistradoActivity extends AppCompatActivity {
     }
 
 
+
+
     public void cargar(){
+
+        Intent y = getIntent();
+        Bundle b = y.getExtras();
+        final String codigo_resp = b.getString("localidad");
+
         URegistradoActivity.Ciudad com=new Ciudad();
+
         Temperatura temperatura_asignacion = new Temperatura();
+        TemperaturaMañana temperaturaMañana=new TemperaturaMañana();
+        TemperaturaPasadoMañana temperaturaPasadoMañana = new TemperaturaPasadoMañana();
+
         Precipitaciones precipitaciones=new Precipitaciones();
         PrecipitacionesMañana precipitacionesMañana=new PrecipitacionesMañana();
         PrecipitacionesPasadoMañana precipitacionesPasadoMañana=new PrecipitacionesPasadoMañana();
 
-        //Falta añadir la base de datos para seleccionar la ciudad.
-        //String ciudad_database = "http://www.aemet.es/xml/municipios/localidad_09059.xml"; //Burgos
-        String ciudad_database = "http://www.aemet.es/xml/municipios/localidad_44216.xml"; //Teruel
+        //Ciudad Seleccionada en la database.
+        String ciudad_database = "http://www.aemet.es/xml/municipios/localidad_"+codigo_resp+".xml";
 
         com.execute(ciudad_database);
+
         temperatura_asignacion.execute(ciudad_database);
+        temperaturaMañana.execute(ciudad_database);
+        temperaturaPasadoMañana.execute(ciudad_database);
 
         precipitaciones.execute(ciudad_database);
         precipitacionesMañana.execute(ciudad_database);
@@ -144,7 +166,7 @@ public class URegistradoActivity extends AppCompatActivity {
 
     }
 
-
+//Temperaturas del API:
     private class Temperatura extends AsyncTask<String, Void, String> {
 
 
@@ -205,6 +227,136 @@ public class URegistradoActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
 
             MinMax.setText(result);
+
+        }
+
+    }
+
+    private class TemperaturaMañana extends AsyncTask<String, Void, String> {
+
+
+        @Override
+        protected String doInBackground(String... params) {
+            String temperatura = "";
+            try {
+                URL url = new URL(params[0]);
+                URLConnection con = url.openConnection();
+
+                InputStream is = con.getInputStream();
+                Document doc;
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder;
+                builder = factory.newDocumentBuilder();
+                doc = builder.parse(is);
+
+                //RECUPERAMOS LOS ELEMENTOS DEL API http://www.aemet.es/xml/municipios/localidad_09059.xml , EN ESTE CASO PARA BURGOS.
+
+
+                NodeList listaTempMax = doc.getElementsByTagName("maxima");
+                NodeList listaTempMin = doc.getElementsByTagName("minima");
+
+                //CALCULAMOS TEMPERATURA MEDIA
+                double media_temp ;
+                double maximo = 0;
+                double minimo = 0;
+
+                String valormax = listaTempMax.item(3).getTextContent();
+                if (valormax == null || valormax.equals("")) {
+                    valormax = "0";
+                }
+                maximo += Double.parseDouble(valormax);
+                String valormin = listaTempMin.item(3).getTextContent();
+                if (valormin == null || valormin.equals("")) {
+                    valormin = "0";
+                }
+                minimo += Double.parseDouble(valormin);
+
+                media_temp = (maximo+minimo) / 2;
+
+
+                //ASIGNAMOS LA TEMPERATURA MEDIA, MAXIMA Y MINIMA AL TEXTVIEW.
+                temperatura += "  "+media_temp +"ºC"+ "\n" +
+                        "Max: "+ listaTempMax.item(3).getTextContent() + "ºC" + "\n"+
+                        "Min: " +   listaTempMin.item(3).getTextContent() + "ºC" + "\n";
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                return temperatura;
+            }
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            MinMaxMañana.setText(result);
+
+        }
+
+    }
+
+    private class TemperaturaPasadoMañana extends AsyncTask<String, Void, String> {
+
+
+        @Override
+        protected String doInBackground(String... params) {
+            String temperatura = "";
+            try {
+                URL url = new URL(params[0]);
+                URLConnection con = url.openConnection();
+
+                InputStream is = con.getInputStream();
+                Document doc;
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder;
+                builder = factory.newDocumentBuilder();
+                doc = builder.parse(is);
+
+                //RECUPERAMOS LOS ELEMENTOS DEL API http://www.aemet.es/xml/municipios/localidad_09059.xml , EN ESTE CASO PARA BURGOS.
+
+
+                NodeList listaTempMax = doc.getElementsByTagName("maxima");
+                NodeList listaTempMin = doc.getElementsByTagName("minima");
+
+                //CALCULAMOS TEMPERATURA MEDIA
+                double media_temp ;
+                double maximo = 0;
+                double minimo = 0;
+
+                String valormax = listaTempMax.item(6).getTextContent();
+                if (valormax == null || valormax.equals("")) {
+                    valormax = "0";
+                }
+                maximo += Double.parseDouble(valormax);
+                String valormin = listaTempMin.item(6).getTextContent();
+                if (valormin == null || valormin.equals("")) {
+                    valormin = "0";
+                }
+                minimo += Double.parseDouble(valormin);
+
+                media_temp = (maximo+minimo) / 2;
+
+
+                //ASIGNAMOS LA TEMPERATURA MEDIA, MAXIMA Y MINIMA AL TEXTVIEW.
+                temperatura += "  "+media_temp +"ºC"+ "\n" +
+                        "Max: "+ listaTempMax.item(6).getTextContent() + "ºC" + "\n"+
+                        "Min: " +   listaTempMin.item(6).getTextContent() + "ºC" + "\n";
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                return temperatura;
+            }
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            MinMaxPasadoMañana.setText(result);
 
         }
 

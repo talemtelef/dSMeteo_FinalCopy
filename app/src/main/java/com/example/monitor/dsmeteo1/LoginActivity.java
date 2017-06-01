@@ -23,10 +23,6 @@ public class LoginActivity extends AppCompatActivity {
     private static final String user = "root";
     private static final String pass = "monitor2016";
 
-//    private static final String url = "jdbc:mysql://mysql.hostinger.es/u332143194_ciuda";
-//    private static final String user = "u332143194_root";
-//    private static final String pass = "Qwerty12345";
-
     private EditText Password, EMail;
 
     @Override
@@ -64,7 +60,6 @@ public class LoginActivity extends AppCompatActivity {
                 Connection con = DriverManager.getConnection(url, user, pass);
 
                 Statement st = con.createStatement();
-                //String sql = "SELECT * FROM ciudades.usuario";
                 String sql = ("SELECT * FROM ciudades.usuario where Email = '"+dEMail+"' AND Contraseña = '"+dPassword+"' ; ");
 
                 final ResultSet rs = st.executeQuery(sql);

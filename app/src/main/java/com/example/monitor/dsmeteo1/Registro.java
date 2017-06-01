@@ -31,7 +31,7 @@ public class Registro extends AppCompatActivity {
         Nombre = (EditText) findViewById(R.id.Nombre);
         Password = (EditText) findViewById(R.id.Password);
         EMail = (EditText) findViewById(R.id.EMail);
-        Button ingress = (Button) findViewById(R.id.Registrar);
+        Button ingress = (Button) findViewById(R.id.Registrar2);
         ingress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,13 +45,14 @@ public class Registro extends AppCompatActivity {
         String fNombre= Nombre.getText().toString();
         String fPassword= Password.getText().toString();
         String fEMail=EMail.getText().toString();
-        Connection con=null;
+        Connection con = null;
         Statement st;
         private String mensaje;
 
 
         @Override
         protected Void doInBackground(Void... params) {
+
             try{
 
                 Class.forName("com.mysql.jdbc.Driver");
@@ -63,7 +64,6 @@ public class Registro extends AppCompatActivity {
                     return null;
                 }
 
-                String sql = "SELECT * FROM ciudades.usuario";
                 st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
                 int resultado=st.executeUpdate("insert into usuario (Nombre, Contraseña, Email) values ('"+fNombre+"','"+fPassword+"','"+fEMail+"')");
@@ -78,11 +78,11 @@ public class Registro extends AppCompatActivity {
                     mensaje = "Email repetido";
                 }
             } catch (ClassNotFoundException e) {
-                Intent myIntent = new Intent(Registro.this, Ubication.class);
-                startActivity(myIntent);
+//                Intent myIntent = new Intent(Registro.this, Ubication.class);
+//                startActivity(myIntent);
                 e.printStackTrace();
             }finally {
-                if(con !=null){
+                if(con != null){
                     try {
                         st.close();
                         con.close();
@@ -108,6 +108,7 @@ public class Registro extends AppCompatActivity {
             super.onPostExecute(result);
         }
     }
+
     private void borrarDatos(){
         Nombre.setText("");
         Password.setText("");

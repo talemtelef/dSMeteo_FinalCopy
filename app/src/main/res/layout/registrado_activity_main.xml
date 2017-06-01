@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/select"
     tools:context="com.example.monitor.dsmeteo1.URegistradoActivity">
 
 
@@ -58,4 +59,23 @@
         app:srcCompat="@drawable/icono0"
         android:layout_alignTop="@+id/imageViewIconos_Mañana"
         android:layout_toEndOf="@+id/MinMax" />
+
+    <TextView
+        android:id="@+id/MinMax_Mañana"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/imageViewIconos_Mañana"
+        android:layout_alignStart="@+id/imageViewIconos_Mañana"
+        android:layout_below="@+id/imageViewIconosPasadoMañana"
+        android:layout_marginTop="14dp"
+        android:text="Mañana" />
+
+    <TextView
+        android:id="@+id/MinMaxPasado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/imageViewIconosPasadoMañana"
+        android:layout_alignStart="@+id/imageViewIconosPasadoMañana"
+        android:layout_alignTop="@+id/MinMax_Mañana"
+        android:text="Pasado Mañana" />
 </RelativeLayout>

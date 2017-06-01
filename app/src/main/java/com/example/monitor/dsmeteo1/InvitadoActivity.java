@@ -1,5 +1,6 @@
 package com.example.monitor.dsmeteo1;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,23 +33,26 @@ public class InvitadoActivity extends AppCompatActivity {
         MinMax = (TextView) this.findViewById(R.id.MinMax);
         imageViewIconos=(ImageView)this.findViewById(R.id.imageViewIconos);
 
+        cargar();
 
     }
 
-
-
-
     private void cargar(){
+
+        Intent y = getIntent();
+        Bundle b = y.getExtras();
+        final String codigo_resp = b.getString("localidad");
+
         ComunicacionTask com=new ComunicacionTask();
         Temperatura temperatura_asignacion = new Temperatura();
         Precipitaciones precipitaciones=new Precipitaciones();
 
         //Falta añadir la base de datos para seleccionar la ciudad.
-        String ciudad_database = "http://www.aemet.es/xml/municipios/localidad_09059.xml";
+        String ciudad_database = "http://www.aemet.es/xml/municipios/localidad_"+codigo_resp+".xml";
 
 
-        com.execute("http://www.aemet.es/xml/municipios/localidad_09059.xml"); //Burgos
-        temperatura_asignacion.execute("http://www.aemet.es/xml/municipios/localidad_09059.xml");
+        com.execute(ciudad_database); //Burgos
+        temperatura_asignacion.execute(ciudad_database);
         precipitaciones.execute(ciudad_database);
 
     }
