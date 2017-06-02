@@ -18,7 +18,7 @@ import java.sql.Statement;
 
 public class Registro extends AppCompatActivity {
 
-    private static final String url = "jdbc:mysql://192.168.51.2:3306/ciudades";
+    private static final String url = "jdbc:mysql://192.168.1.102:3306/ciudades";
     private static final String user = "root";
     private static final String pass = "monitor2016";
     private EditText Nombre, Password, EMail;
